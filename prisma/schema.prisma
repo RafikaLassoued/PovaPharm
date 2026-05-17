@@ -1,0 +1,254 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  
+}
+
+model Admin {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String
+  name         String    @default("Admin")
+  role         String    @default("admin")
+  createdAt    DateTime  @default(now())
+  lastLoginAt  DateTime?
+}
+
+model SiteSettings {
+  id              Int     @id @default(autoincrement())
+  siteName        String  @default("LAVA Pharm")
+  logoUrl         String?
+  statProducts    String  @default("500+")
+  statClients     String  @default("10K+")
+  statNatural     String  @default("100%")
+  topBarText      String  @default("Free delivery on orders over 10,000 DZD")
+  freeDeliveryMin Int     @default(10000)
+  address         String  @default("123 Rue de la Beaute, El Oued, 39000, Algeria")
+  phone           String  @default("+213 (0) 29 XX XX XX")
+  whatsapp        String  @default("+213 (0) 5X XX XX XX")
+  contactEmail    String  @default("contact@lavapharm.dz")
+  workingHours    String  @default("Saturday - Thursday: 9:00 AM - 8:00 PM")
+  facebook        String  @default("#")
+  instagram       String  @default("#")
+  tiktok          String  @default("#")
+  whatsappLink    String  @default("https://wa.me/213000000000")
+  locationLat     Float   @default(33.3682)
+  locationLng     Float   @default(6.8528)
+  locationLabel   String  @default("LAVA Pharm Store, El Oued")
+  smsEnabled      Boolean @default(false)
+  smsApiKey       String  @default("")
+  adminPhone      String  @default("")
+  totalLikes      Int     @default(0)
+  // Analytics & Tracking
+  metaPixelId     String  @default("")
+  tiktokPixelId   String  @default("")
+  googleAnalyticsId String @default("")
+  // SEO Settings
+  seoTitle        String  @default("")
+  seoDescription  String  @default("")
+  seoKeywords     String  @default("")
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  image       String?
+  emoji       String   @default("✨")
+  description String?
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model Brand {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  logoUrl     String?
+  description String?
+  active      Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  code        String   @unique
+  category    String
+  brand       String
+  price       Int
+  oldPrice    Int?
+  emoji       String   @default("✨")
+  image       String?
+  images      String[] @default([])
+  rating      Float    @default(0)
+  reviewCount Int      @default(0)
+  stock       Int      @default(0)
+  sale        Boolean  @default(false)
+  featured    Boolean  @default(false)
+  description String   @db.Text
+  shortDesc   String   @default("")
+  likes       Int      @default(0)
+  active      Boolean  @default(true)
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems  OrderItem[]
+  reviews     Review[]
+}
+
+// ── شركة التوصيل ──────────────────────────────────────────
+model DeliveryCompany {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  logoUrl     String?
+  active      Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  prices      DeliveryPrice[]
+}
+
+// ── سعر التوصيل: شركة × ولاية × نوع ─────────────────────
+model DeliveryPrice {
+  id          Int    @id @default(autoincrement())
+  companyId   Int
+  wilayaCode  Int
+  wilayaName  String
+  homePrice   Int    @default(500)   // توصيل للمنزل
+  officePrice Int    @default(400)   // توصيل للمكتب
+  communePrice Int   @default(600)   // توصيل للبلدية
+
+  company DeliveryCompany @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, wilayaCode])
+}
+
+model Customer {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String   @unique
+  phone     String?
+  address   String?
+  wilaya    String?
+  createdAt DateTime @default(now())
+  orders    Order[]
+}
+
+model Order {
+  id               Int         @id @default(autoincrement())
+  orderNumber      String      @unique
+  customerId       Int?
+  customerName     String
+  customerPhone    String
+  customerAddress  String
+  customerWilaya   String
+  deliveryType     String      @default("home")     // home | office | commune
+  deliveryCompany  String      @default("")
+  paymentMethod    String      @default("cod")
+  status           OrderStatus @default(PENDING)
+  subtotal         Int
+  delivery         Int         @default(500)
+  discount         Int         @default(0)
+  total            Int
+  notes            String?     @db.Text
+  smsSent          Boolean     @default(false)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  customer  Customer?   @relation(fields: [customerId], references: [id])
+  items     OrderItem[]
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  name      String
+  code      String
+  price     Int
+  quantity  Int
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model PromoCode {
+  id         Int       @id @default(autoincrement())
+  code       String    @unique
+  discount   Float
+  type       String    @default("percentage")
+  usedCount  Int       @default(0)
+  maxUses    Int?
+  firstOrder Boolean   @default(false)
+  expiresAt  DateTime?
+  active     Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  name      String
+  rating    Int
+  comment   String   @db.Text
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String
+  phone     String?
+  subject   String
+  message   String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model StaticPage {
+  id        Int      @id @default(autoincrement())
+  slug      String   @unique
+  title     String
+  content   String   @db.Text
+  published Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+}
+
+model SiteStat {
+  id     Int      @id @default(autoincrement())
+  date   DateTime @default(now()) @db.Date
+  visits Int      @default(0)
+  likes  Int      @default(0)
+
+  @@unique([date])
+}
+
+model SiteRating {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String?  @db.Text
+  createdAt DateTime @default(now())
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPING
+  DELIVERED
+  CANCELLED
+}
+
+// Add deletedAt to Product for soft delete
+// Run: npx prisma migrate dev --name add-soft-delete
