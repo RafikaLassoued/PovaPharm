@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { formatNumber } from '@/lib/utils'
 
 const STATUS_MAP = {
   PENDING:   { bg: '#FEF3C7', color: '#92400E', label: 'Pending' },

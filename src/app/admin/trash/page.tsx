@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { TrashClient } from './TrashClient'
+export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Trash | Admin' }
 
 export default async function TrashPage() {

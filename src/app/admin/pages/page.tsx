@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { AdminPagesClient } from './AdminPagesClient'
 
+export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Pages | Admin' }
 
 export default async function AdminPagesPage() {

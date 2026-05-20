@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { HeroAdminClient } from './HeroAdminClient'
 
+export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Hero Products | Admin' }
 
 export default async function AdminHeroPage() {

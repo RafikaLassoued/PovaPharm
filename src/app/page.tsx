@@ -8,6 +8,8 @@ import { BrandsSection } from '@/components/home/HomeComponents'
 import { TrustBadges } from '@/components/home/HomeComponents'
 import { TopBar } from '@/components/home/TopBar'
 
+export const dynamic = 'force-dynamic'
+
 export default async function HomePage() {
   const [featured, onSale, promos, settings] = await Promise.all([
     // جلب المنتجات المميزة — إذا لم توجد، جلب آخر 8 منتجات

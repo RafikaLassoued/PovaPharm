@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useCart } from '@/store/cart'
 import { useToast } from '@/components/ui/Toast'
 import { useRouter } from 'next/navigation'
-import html2pdf from 'html2pdf.js'
 import { formatNumber } from '@/lib/utils'
 type DeliveryType = 'home' | 'office' | 'commune'
 
@@ -109,7 +108,7 @@ export default function CartPage() {
     setPlacing(false)
   }
 
-   function printReceipt() {
+   async function printReceipt() {
   if (!completedOrder) return
   const o = completedOrder
   const receiptHtml = document.createElement('div')
@@ -135,6 +134,7 @@ export default function CartPage() {
     <hr/>
     <p style="text-align:center;">Thank you for shopping with us!<br/>شكراً لتسوقكم معنا</p>
   `
+  const html2pdf = (await import('html2pdf.js')).default
   html2pdf()
     .set({ margin: 10, filename: `Receipt-${o.orderNumber}.pdf`, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a6', orientation: 'portrait' } })
     .from(receiptHtml)

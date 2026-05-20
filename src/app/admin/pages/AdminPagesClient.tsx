@@ -257,7 +257,6 @@ export function AdminPagesClient({ pages: initialPages }: { pages: Page[] }) {
                     padding: '10px',
                     border: '1px solid #ddd',
                     borderRadius: 'var(--radius)',
-                    fontSize: 14,
                     fontFamily: 'monospace',
                     minHeight: 300,
                     fontSize: 12,

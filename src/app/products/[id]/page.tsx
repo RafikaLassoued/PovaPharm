@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { ProductDetailClient } from './ProductDetailClient'
 import type { Metadata } from 'next'
 
+export const dynamic = 'force-dynamic'
+
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const product = await prisma.product.findUnique({ where: { id: parseInt(params.id) } })
   if (!product) return { title: 'Product Not Found' }

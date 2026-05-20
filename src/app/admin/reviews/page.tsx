@@ -3,6 +3,8 @@ import { ReviewsClient } from './ReviewsClient'
 import { getSession } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminReviewsPage() {
   const session = await getSession()
   if (!session) redirect('/dashboard-secure-x7k2')
@@ -13,5 +15,10 @@ export default async function AdminReviewsPage() {
     take: 100,
   })
 
-  return <ReviewsClient initialReviews={reviews} />
+  const serializedReviews = reviews.map(review => ({
+    ...review,
+    createdAt: review.createdAt.toISOString(),
+  }))
+
+  return <ReviewsClient initialReviews={serializedReviews} />
 }

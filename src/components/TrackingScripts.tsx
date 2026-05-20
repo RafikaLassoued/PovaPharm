@@ -1,49 +1,64 @@
-import { prisma } from '@/lib/prisma'
+'use client'
+import { useEffect } from 'react'
+import { useSettings } from '@/context/SettingsContext'
 
-export default async function TrackingScripts() {
-  const settings = await prisma.siteSettings.findFirst()
-  
-  if (!settings) return null
+export default function TrackingScripts() {
+  const { settings } = useSettings()
 
-  return (
-    <>
-      {/* Meta Pixel (Facebook Pixel) */}
-      {settings.metaPixelId && (
-        <>
-          <script async src={`https://connect.facebook.net/en_US/fbevents.js`}></script>
-          <script dangerouslySetInnerHTML={{__html: `
-            fbq('init', '${settings.metaPixelId}');
-            fbq('track', 'PageView');
-          `}}></script>
-          <noscript>
-            <img height="1" width="1" style={{display: 'none'}} src={`https://www.facebook.com/tr?id=${settings.metaPixelId}&ev=PageView&noscript=1`} />
-          </noscript>
-        </>
-      )}
+  useEffect(() => {
+    if (!settings) return
 
-      {/* TikTok Pixel */}
-      {settings.tiktokPixelId && (
-        <>
-          <script src="https://analytics.tiktok.com/i18n/pixel/events.js"></script>
-          <script dangerouslySetInnerHTML={{__html: `
-            tiktok.track('PageView');
-            tiktok.instance.track('PageView');
-          `}}></script>
-        </>
-      )}
+    const scripts: HTMLScriptElement[] = []
 
-      {/* Google Analytics */}
-      {settings.googleAnalyticsId && (
-        <>
-          <script async src={`https://www.googletagmanager.com/gtag/js?id=${settings.googleAnalyticsId}`}></script>
-          <script dangerouslySetInnerHTML={{__html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${settings.googleAnalyticsId}');
-          `}}></script>
-        </>
-      )}
-    </>
-  )
+    const addScript = (src: string, async = true) => {
+      const script = document.createElement('script')
+      script.src = src
+      script.async = async
+      document.head.appendChild(script)
+      scripts.push(script)
+      return script
+    }
+
+    const addInlineScript = (code: string) => {
+      const script = document.createElement('script')
+      script.textContent = code
+      document.head.appendChild(script)
+      scripts.push(script)
+      return script
+    }
+
+    if (settings.metaPixelId) {
+      addScript('https://connect.facebook.net/en_US/fbevents.js')
+      addInlineScript(`
+        fbq('init', '${settings.metaPixelId}');
+        fbq('track', 'PageView');
+      `)
+    }
+
+    if (settings.tiktokPixelId) {
+      addScript('https://analytics.tiktok.com/i18n/pixel/events.js')
+      addInlineScript(`
+        tiktok.track('PageView');
+        tiktok.instance.track('PageView');
+      `)
+    }
+
+    if (settings.googleAnalyticsId) {
+      addScript(`https://www.googletagmanager.com/gtag/js?id=${settings.googleAnalyticsId}`)
+      addInlineScript(`
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '${settings.googleAnalyticsId}');
+      `)
+    }
+
+    return () => {
+      scripts.forEach(script => {
+        if (script.parentNode) script.parentNode.removeChild(script)
+      })
+    }
+  }, [settings])
+
+  return null
 }

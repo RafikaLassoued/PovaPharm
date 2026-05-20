@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Analytics | Admin' }
 
 export default async function AdminAnalyticsPage() {

@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { AdminOrdersClient } from './AdminOrdersClient'
 
+export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Orders | Admin' }
 
 export default async function AdminOrdersPage() {
