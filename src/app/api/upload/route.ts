@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getEnvVar, getOptionalEnvVar } from '@/lib/env'
 
-const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL
-const SUPABASE_KEY  = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const SUPABASE_URL = getEnvVar('NEXT_PUBLIC_SUPABASE_URL')
+const SUPABASE_KEY = getEnvVar('NEXT_PUBLIC_SUPABASE_ANON_KEY')
 // Service role key للـ server-side (أكثر صلاحيات)
-const SERVICE_KEY   = process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_KEY
+const SERVICE_KEY = getOptionalEnvVar('SUPABASE_SERVICE_ROLE_KEY') || SUPABASE_KEY
 
 type BucketKey = 'products' | 'categories' | 'brands' | 'logos'
 const VALID_BUCKETS: BucketKey[] = ['products', 'categories', 'brands', 'logos']

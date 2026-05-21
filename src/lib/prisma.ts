@@ -1,4 +1,8 @@
 import { PrismaClient } from '@prisma/client'
+import { getEnvVar } from './env'
+
+const databaseUrl = getEnvVar('DATABASE_URL')
+process.env.DATABASE_URL = databaseUrl
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
 

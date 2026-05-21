@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getEnvVar, getOptionalEnvVar } from '@/lib/env'
 
 export async function GET() {
-  const url  = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key  = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const url = getOptionalEnvVar('NEXT_PUBLIC_SUPABASE_URL')
+  const key = getOptionalEnvVar('NEXT_PUBLIC_SUPABASE_ANON_KEY')
 
   if (!url || !key) {
     return NextResponse.json({
@@ -34,8 +35,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const url = getEnvVar('NEXT_PUBLIC_SUPABASE_URL')
+  const key = getEnvVar('NEXT_PUBLIC_SUPABASE_ANON_KEY')
 
   if (!url || !key) {
     return NextResponse.json({ ok: false, error: 'Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY in .env' }, { status: 500 })
